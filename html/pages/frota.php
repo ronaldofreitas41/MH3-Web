@@ -1,7 +1,36 @@
 <div class="page" id="pg-frota">
-<div class="shdr"><span style="color:var(--mt);font-size:11px">Base de dados da frota</span><button class="btn bp" onclick="openNewEq()">+ Veículo/Equipamento</button>
-<button class="btn bw btn-sm no-print" onclick="importarFrotaPlanilha()" title="Importar os veículos da planilha enviada (uma vez)">📥 Importar Planilha</button><button class="btn bcy btn-sm no-print" onclick="abrirImportKmHr()" title="Atualizar KM e horímetro de vários veículos por placa">📊 Atualizar KM/Horímetro</button><button class="btn bg btn-sm no-print" onclick="abrirRelFrota()" title="Gerar relatórios da frota (completo, simples, patrimonial, vencimentos)">📊 Relatórios</button><button class="btn bcy btn-sm no-print" onclick="gerarParcelasFaltantes()" title="Lançar no Contas a Pagar as parcelas dos veículos financiados/consórcio que ainda não têm">🔄 Gerar parcelas faltantes</button><button class="btn bd btn-sm no-print" onclick="excluirFrotaSelecionados()" title="Excluir os veículos marcados (em massa)">🗑️ Excluir selecionados</button></div>
-<div style="margin-bottom:10px"><input oninput="filtrarTabela(this,'frota-tb')" placeholder="🔍 Buscar por placa, marca, modelo..." style="width:100%;max-width:400px;padding:9px 12px;border:1px solid var(--br);border-radius:8px;background:var(--cd2);color:var(--tx);font-size:13px" type="search"/></div>
-<div class="search-bar"><input id="frota-srch" oninput="rdFrota()" placeholder="🔍 Buscar por placa, modelo, proprietário..."/><select id="frota-st" onchange="rdFrota()"><option value="">Todos os Status</option><option value="disponivel">Disponível</option><option value="alocado">Alocado</option><option value="imobilizado">Imobilizado</option><option value="vendido">Vendido</option><option value="uso_empresa">Uso Empresa</option></select></div>
-<div class="panel"><div class="tw"><table><thead><tr><th style="width:30px;text-align:center"><input onclick="frotaSelTodos(this)" title="Selecionar todos os visíveis" type="checkbox"/></th><th>Placa</th><th>Marca / Tipo</th><th>Ano</th><th>Cond.</th><th>Implemento</th><th>Proprietário</th><th>KM atual</th><th>H. atual</th><th>Status</th><th></th></tr></thead><tbody id="frota-tb"></tbody></table></div></div>
+    <div class="shdr"><span style="color:var(--mt);font-size:11px">Base de dados da frota</span><button class="btn bp" onclick="openNewEq()">+ Veículo/Equipamento</button>
+        <button class="btn bw btn-sm no-print" onclick="importarFrotaPlanilha()" title="Importar os veículos da planilha enviada (uma vez)">📥 Importar Planilha</button><button class="btn bcy btn-sm no-print" onclick="abrirImportKmHr()" title="Atualizar KM e horímetro de vários veículos por placa">📊 Atualizar KM/Horímetro</button><button class="btn bg btn-sm no-print" onclick="abrirRelFrota()" title="Gerar relatórios da frota (completo, simples, patrimonial, vencimentos)">📊 Relatórios</button><button class="btn bcy btn-sm no-print" onclick="gerarParcelasFaltantes()" title="Lançar no Contas a Pagar as parcelas dos veículos financiados/consórcio que ainda não têm">🔄 Gerar parcelas faltantes</button><button class="btn bd btn-sm no-print" onclick="excluirFrotaSelecionados()" title="Excluir os veículos marcados (em massa)">🗑️ Excluir selecionados</button>
+    </div>
+    <div style="margin-bottom:10px"><input oninput="filtrarTabela(this,'frota-tb')" placeholder="🔍 Buscar por placa, marca, modelo..." style="width:100%;max-width:400px;padding:9px 12px;border:1px solid var(--br);border-radius:8px;background:var(--cd2);color:var(--tx);font-size:13px" type="search" /></div>
+    <div class="search-bar"><input id="frota-srch" oninput="rdFrota()" placeholder="🔍 Buscar por placa, modelo, proprietário..." /><select id="frota-st" onchange="rdFrota()">
+            <option value="">Todos os Status</option>
+            <option value="disponivel">Disponível</option>
+            <option value="alocado">Alocado</option>
+            <option value="imobilizado">Imobilizado</option>
+            <option value="vendido">Vendido</option>
+            <option value="uso_empresa">Uso Empresa</option>
+        </select></div>
+    <div class="panel">
+        <div class="tw">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:30px;text-align:center"><input onclick="frotaSelTodos(this)" title="Selecionar todos os visíveis" type="checkbox" /></th>
+                        <th>Placa</th>
+                        <th>Marca / Tipo</th>
+                        <th>Ano</th>
+                        <th>Cond.</th>
+                        <th>Implemento</th>
+                        <th>Proprietário</th>
+                        <th>KM atual</th>
+                        <th>H. atual</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="frota-tb"></tbody>
+            </table>
+        </div>
+    </div>
 </div>

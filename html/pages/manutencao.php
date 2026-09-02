@@ -1,10 +1,40 @@
 <div class="page" id="pg-manutencao">
-<div class="shdr"><span style="color:var(--mt);font-size:11px">Ordens de Serviço</span><button class="btn bp" onclick="openM('m-mn')">+ Nova OS</button><button class="btn bw btn-sm no-print" onclick="abrirImportacao('manutencao')" title="Importar planilha CSV">📥 Importar</button><button class="btn bd btn-sm no-print" onclick="limparModulo('manutencao')" title="Apagar TODOS os dados desta aba (somente admin)">🗑 Limpar Tudo</button><button class="btn bg btn-sm no-print" onclick="toggleEmpresasPanel()" title="Cadastrar empresas (OS só para placas de empresa cadastrada)">🏢 Empresas</button></div>
-<div class="panel" id="empresas-panel" style="display:none;margin-bottom:12px">
-<div class="ph"><div class="pt">🏢 Empresas Cadastradas</div><button class="btn bp btn-sm" onclick="novaEmpresa()" title="Cadastrar nova empresa">+ Empresa</button></div>
-<div class="pb"><p style="font-size:11px;color:var(--mt);margin-bottom:8px">A OS só pode ser gerada para veículos vinculados a uma empresa cadastrada. Cadastre a empresa e defina-a no cadastro de cada veículo.</p><div id="empresas-lista"></div></div>
-</div>
-<div style="margin-bottom:10px"><input oninput="filtrarTabela(this,'mn-tb')" placeholder="🔍 Buscar por placa, OS..." style="width:100%;max-width:400px;padding:9px 12px;border:1px solid var(--br);border-radius:8px;background:var(--cd2);color:var(--tx);font-size:13px" type="search"/></div>
-<div class="search-bar"><input id="mn-srch" oninput="rdManut()" placeholder="🔍 Buscar por nº OS, placa, tipo, cliente..."/><select id="mn-fst" onchange="rdManut()"><option value="">Todos</option><option value="aberta">Abertas</option><option value="aguardando">Aguardando</option><option value="concluida">Concluídas</option></select><span id="mn-cnt" style="font-size:11px;color:var(--mt);align-self:center;margin-left:6px"></span></div>
-<div class="panel"><div class="tw"><table><thead><tr><th>Nº OS</th><th>Placa</th><th>Tipo</th><th>Entrada</th><th>Saída</th><th>KM/H</th><th>Valor</th><th>Custo</th><th>Status</th><th></th></tr></thead><tbody id="mn-tb"></tbody></table></div></div>
+    <div class="shdr"><span style="color:var(--mt);font-size:11px">Ordens de Serviço</span><button class="btn bp" onclick="openM('m-mn')">+ Nova OS</button><button class="btn bw btn-sm no-print" onclick="abrirImportacao('manutencao')" title="Importar planilha CSV">📥 Importar</button><button class="btn bd btn-sm no-print" onclick="limparModulo('manutencao')" title="Apagar TODOS os dados desta aba (somente admin)">🗑 Limpar Tudo</button><button class="btn bg btn-sm no-print" onclick="toggleEmpresasPanel()" title="Cadastrar empresas (OS só para placas de empresa cadastrada)">🏢 Empresas</button></div>
+    <div class="panel" id="empresas-panel" style="display:none;margin-bottom:12px">
+        <div class="ph">
+            <div class="pt">🏢 Empresas Cadastradas</div><button class="btn bp btn-sm" onclick="novaEmpresa()" title="Cadastrar nova empresa">+ Empresa</button>
+        </div>
+        <div class="pb">
+            <p style="font-size:11px;color:var(--mt);margin-bottom:8px">A OS só pode ser gerada para veículos vinculados a uma empresa cadastrada. Cadastre a empresa e defina-a no cadastro de cada veículo.</p>
+            <div id="empresas-lista"></div>
+        </div>
+    </div>
+    <div style="margin-bottom:10px"><input oninput="filtrarTabela(this,'mn-tb')" placeholder="🔍 Buscar por placa, OS..." style="width:100%;max-width:400px;padding:9px 12px;border:1px solid var(--br);border-radius:8px;background:var(--cd2);color:var(--tx);font-size:13px" type="search" /></div>
+    <div class="search-bar"><input id="mn-srch" oninput="rdManut()" placeholder="🔍 Buscar por nº OS, placa, tipo, cliente..." /><select id="mn-fst" onchange="rdManut()">
+            <option value="">Todos</option>
+            <option value="aberta">Abertas</option>
+            <option value="aguardando">Aguardando</option>
+            <option value="concluida">Concluídas</option>
+        </select><span id="mn-cnt" style="font-size:11px;color:var(--mt);align-self:center;margin-left:6px"></span></div>
+    <div class="panel">
+        <div class="tw">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nº OS</th>
+                        <th>Placa</th>
+                        <th>Tipo</th>
+                        <th>Entrada</th>
+                        <th>Saída</th>
+                        <th>KM/H</th>
+                        <th>Valor</th>
+                        <th>Custo</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="mn-tb"></tbody>
+            </table>
+        </div>
+    </div>
 </div>

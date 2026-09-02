@@ -1,1 +1,17 @@
-<div class="mo" id="m-pneu-rel"><div class="md"> <div class="mh"><div class="mt2">📊 Relatório de Pneus</div><button class="x" onclick="closeM('m-pneu-rel')">×</button></div> <div class="mb"> <div class="fg"><label>Organizar o relatório por:</label> <select id="pneu-rel-criterio"> <option value="situacao">Situação (estoque, reforma, aplicado, vendido...)</option> <option value="medida">Medida</option> <option value="marca">Marca</option> <option value="tipo">Tipo</option> <option value="condicao">Condição (novo, reformado, usado)</option> </select></div> <div style="font-size:11px;color:var(--mt);margin-bottom:10px">O relatório mostra os totais de cada grupo e a lista completa dos pneus, pronto para imprimir.</div> <button class="btn bp" onclick="gerarRelPneus()" style="width:100%">🖨️ Gerar e imprimir relatório</button> </div> </div></div>
+<div class="mo" id="m-pneu-rel">
+    <div class="md">
+        <div class="mh">
+            <div class="mt2">📊 Relatório de Pneus</div><button class="x" onclick="closeM('m-pneu-rel')">×</button>
+        </div>
+        <div class="mb">
+            <div class="fg"><label>Organizar o relatório por:</label> <select id="pneu-rel-criterio">
+                    <option value="situacao">Situação (estoque, reforma, aplicado, vendido...)</option>
+                    <option value="medida">Medida</option>
+                    <option value="marca">Marca</option>
+                    <option value="tipo">Tipo</option>
+                    <option value="condicao">Condição (novo, reformado, usado)</option>
+                </select></div>
+            <div style="font-size:11px;color:var(--mt);margin-bottom:10px">O relatório mostra os totais de cada grupo e a lista completa dos pneus, pronto para imprimir.</div> <button class="btn bp" onclick="gerarRelPneus()" style="width:100%">🖨️ Gerar e imprimir relatório</button>
+        </div>
+    </div>
+</div>

@@ -8,20 +8,26 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, X-Token');
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { exit; }
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit;
+}
 
 if (function_exists('mb_internal_encoding')) mb_internal_encoding('UTF-8');
 @date_default_timezone_set('America/Sao_Paulo');
 
 $raw = file_get_contents('php://input');
 $in = json_decode($raw, true);
-if (!is_array($in)) { $in = $_POST; }
+if (!is_array($in)) {
+    $in = $_POST;
+}
 
 if ((isset($in['chave']) ? $in['chave'] : '') !== 'mh3-imap-2026') {
-    echo json_encode(array('ok'=>false, 'msg'=>'Acesso negado.')); exit;
+    echo json_encode(array('ok' => false, 'msg' => 'Acesso negado.'));
+    exit;
 }
 if (!function_exists('imap_open')) {
-    echo json_encode(array('ok'=>false, 'msg'=>'O servidor não tem o módulo IMAP habilitado.')); exit;
+    echo json_encode(array('ok' => false, 'msg' => 'O servidor não tem o módulo IMAP habilitado.'));
+    exit;
 }
 
 $acao  = isset($in['acao'])  ? $in['acao']  : 'listar';
@@ -32,11 +38,13 @@ $senha = isset($in['senha']) ? $in['senha'] : '';
 $pasta = isset($in['pasta']) && $in['pasta'] !== '' ? $in['pasta'] : 'INBOX';
 
 if (!$host || !$login || $senha === '') {
-    echo json_encode(array('ok'=>false, 'msg'=>'Faltam dados da conta (servidor, login ou senha).')); exit;
+    echo json_encode(array('ok' => false, 'msg' => 'Faltam dados da conta (servidor, login ou senha).'));
+    exit;
 }
 
 // ---------- helpers ----------
-function dec_header($str) {
+function dec_header($str)
+{
     if ($str === null || $str === '') return '';
     $out = '';
     $partes = imap_mime_header_decode($str);
@@ -51,18 +59,21 @@ function dec_header($str) {
     }
     return $out;
 }
-function dec_body($body, $enc) {
+function dec_body($body, $enc)
+{
     if ($enc == 3) return base64_decode($body);       // base64
     if ($enc == 4) return quoted_printable_decode($body); // quoted-printable
     return $body;
 }
-function charset_de($part) {
+function charset_de($part)
+{
     if (!empty($part->parameters)) foreach ($part->parameters as $p) {
         if (strtoupper($p->attribute) === 'CHARSET') return $p->value;
     }
     return 'UTF-8';
 }
-function conv_cs($txt, $cs) {
+function conv_cs($txt, $cs)
+{
     $cs = strtoupper($cs);
     if ($cs && $cs !== 'UTF-8' && $cs !== 'US-ASCII') {
         $c = @iconv($cs, 'UTF-8//TRANSLIT', $txt);
@@ -70,9 +81,10 @@ function conv_cs($txt, $cs) {
     }
     return $txt;
 }
-function walk_parts($mbox, $uid, $parts, $prefix, &$html, &$texto, &$anexos) {
+function walk_parts($mbox, $uid, $parts, $prefix, &$html, &$texto, &$anexos)
+{
     foreach ($parts as $i => $part) {
-        $partno = $prefix ? ($prefix.'.'.($i+1)) : (string)($i+1);
+        $partno = $prefix ? ($prefix . '.' . ($i + 1)) : (string)($i + 1);
         $subtype = strtoupper(isset($part->subtype) ? $part->subtype : '');
         $nome = '';
         if (!empty($part->dparameters)) foreach ($part->dparameters as $dp) {
@@ -85,37 +97,43 @@ function walk_parts($mbox, $uid, $parts, $prefix, &$html, &$texto, &$anexos) {
         if ($part->type == 1 && !empty($part->parts)) {
             walk_parts($mbox, $uid, $part->parts, $partno, $html, $texto, $anexos);
         } else if ($isAnexo) {
-            $anexos[] = array('nome'=>dec_header($nome), 'partno'=>$partno, 'tamanho'=>isset($part->bytes)?$part->bytes:0, 'enc'=>isset($part->encoding)?$part->encoding:0);
+            $anexos[] = array('nome' => dec_header($nome), 'partno' => $partno, 'tamanho' => isset($part->bytes) ? $part->bytes : 0, 'enc' => isset($part->encoding) ? $part->encoding : 0);
         } else if ($part->type == 0) {
             $body = imap_fetchbody($mbox, $uid, $partno, FT_UID);
             $body = dec_body($body, $part->encoding);
             $body = conv_cs($body, charset_de($part));
-            if ($subtype === 'HTML') $html .= $body; else $texto .= $body;
+            if ($subtype === 'HTML') $html .= $body;
+            else $texto .= $body;
         }
     }
 }
-function fetch_corpo($mbox, $uid) {
+function fetch_corpo($mbox, $uid)
+{
     $st = imap_fetchstructure($mbox, $uid, FT_UID);
-    $html = ''; $texto = ''; $anexos = array();
+    $html = '';
+    $texto = '';
+    $anexos = array();
     if (empty($st->parts)) {
         $body = imap_fetchbody($mbox, $uid, '1', FT_UID);
-        $body = dec_body($body, isset($st->encoding)?$st->encoding:0);
+        $body = dec_body($body, isset($st->encoding) ? $st->encoding : 0);
         $body = conv_cs($body, charset_de($st));
-        if (strtoupper(isset($st->subtype)?$st->subtype:'') === 'HTML') $html = $body; else $texto = $body;
+        if (strtoupper(isset($st->subtype) ? $st->subtype : '') === 'HTML') $html = $body;
+        else $texto = $body;
     } else {
         walk_parts($mbox, $uid, $st->parts, '', $html, $texto, $anexos);
     }
-    return array('html'=>$html, 'texto'=>$texto, 'anexos'=>$anexos);
+    return array('html' => $html, 'texto' => $texto, 'anexos' => $anexos);
 }
 
 // ---------- conexão ----------
-$ref = '{'.$host.':'.$porta.'/imap/ssl/novalidate-cert}';
+$ref = '{' . $host . ':' . $porta . '/imap/ssl/novalidate-cert}';
 
 // abre a conta (sempre conecta primeiro, validando login/senha)
-$mbox = @imap_open($ref.'INBOX', $login, $senha, 0, 1);
+$mbox = @imap_open($ref . 'INBOX', $login, $senha, 0, 1);
 if (!$mbox) {
-    $err = imap_last_error(); imap_errors();
-    echo json_encode(array('ok'=>false, 'msg'=>'Não foi possível conectar à caixa. '.($err?:'Verifique servidor, login e senha.')));
+    $err = imap_last_error();
+    imap_errors();
+    echo json_encode(array('ok' => false, 'msg' => 'Não foi possível conectar à caixa. ' . ($err ?: 'Verifique servidor, login e senha.')));
     exit;
 }
 
@@ -133,22 +151,34 @@ if ($alvo !== 'INBOX' && $alvo !== '') {
     if ($lista) foreach ($lista as $l) {
         $nome = str_replace($ref, '', $l);
         $nomeDec = $nome;
-        if (function_exists('mb_convert_encoding')) { $t = @mb_convert_encoding($nome, 'UTF-8', 'UTF7-IMAP'); if ($t !== false && $t !== '') $nomeDec = $t; }
+        if (function_exists('mb_convert_encoding')) {
+            $t = @mb_convert_encoding($nome, 'UTF-8', 'UTF7-IMAP');
+            if ($t !== false && $t !== '') $nomeDec = $t;
+        }
         $ln = strtolower($nomeDec);
         $bate = false;
-        foreach ($padroes as $pad) { if (strpos($ln, $pad) !== false) { $bate = true; break; } }
-        if ($bate) { $achou = $nome; break; }
+        foreach ($padroes as $pad) {
+            if (strpos($ln, $pad) !== false) {
+                $bate = true;
+                break;
+            }
+        }
+        if ($bate) {
+            $achou = $nome;
+            break;
+        }
     }
     if (!$achou) {
         imap_close($mbox);
-        echo json_encode(array('ok'=>false, 'msg'=>'Não encontrei a pasta "'.$pasta.'" nesta conta de e-mail.'));
+        echo json_encode(array('ok' => false, 'msg' => 'Não encontrei a pasta "' . $pasta . '" nesta conta de e-mail.'));
         exit;
     }
     @imap_close($mbox);
-    $mbox = @imap_open($ref.$achou, $login, $senha, 0, 1);
+    $mbox = @imap_open($ref . $achou, $login, $senha, 0, 1);
     if (!$mbox) {
-        $err = imap_last_error(); imap_errors();
-        echo json_encode(array('ok'=>false, 'msg'=>'Não consegui abrir a pasta "'.$pasta.'". '.($err?:'')));
+        $err = imap_last_error();
+        imap_errors();
+        echo json_encode(array('ok' => false, 'msg' => 'Não consegui abrir a pasta "' . $pasta . '". ' . ($err ?: '')));
         exit;
     }
 }
@@ -159,28 +189,40 @@ if ($acao === 'pastas') {
     if ($lista) foreach ($lista as $l) {
         $nome = str_replace($ref, '', $l);
         $nomeDec = $nome;
-        if (function_exists('mb_convert_encoding')) { $tmp = @mb_convert_encoding($nome, 'UTF-8', 'UTF7-IMAP'); if ($tmp !== false && $tmp !== '') $nomeDec = $tmp; }
-        $pastas[] = array('caminho'=>$nomeDec, 'nome'=>$nomeDec);
+        if (function_exists('mb_convert_encoding')) {
+            $tmp = @mb_convert_encoding($nome, 'UTF-8', 'UTF7-IMAP');
+            if ($tmp !== false && $tmp !== '') $nomeDec = $tmp;
+        }
+        $pastas[] = array('caminho' => $nomeDec, 'nome' => $nomeDec);
     }
     imap_close($mbox);
-    echo json_encode(array('ok'=>true, 'pastas'=>$pastas)); exit;
+    echo json_encode(array('ok' => true, 'pastas' => $pastas));
+    exit;
 }
 
 if ($acao === 'baixar_anexo') {
     $uid = intval(isset($in['uid']) ? $in['uid'] : 0);
-    $partno = isset($in['partno']) ? preg_replace('/[^0-9.]/','',$in['partno']) : '';
+    $partno = isset($in['partno']) ? preg_replace('/[^0-9.]/', '', $in['partno']) : '';
     $enc = intval(isset($in['enc']) ? $in['enc'] : 0);
-    if (!$uid || $partno === '') { imap_close($mbox); echo json_encode(array('ok'=>false, 'msg'=>'Anexo inválido.')); exit; }
+    if (!$uid || $partno === '') {
+        imap_close($mbox);
+        echo json_encode(array('ok' => false, 'msg' => 'Anexo inválido.'));
+        exit;
+    }
     $body = imap_fetchbody($mbox, $uid, $partno, FT_UID);
     $body = dec_body($body, $enc);
     imap_close($mbox);
-    echo json_encode(array('ok'=>true, 'base64'=>base64_encode($body)));
+    echo json_encode(array('ok' => true, 'base64' => base64_encode($body)));
     exit;
 }
 
 if ($acao === 'ler') {
     $uid = intval(isset($in['uid']) ? $in['uid'] : 0);
-    if (!$uid) { imap_close($mbox); echo json_encode(array('ok'=>false, 'msg'=>'Mensagem inválida.')); exit; }
+    if (!$uid) {
+        imap_close($mbox);
+        echo json_encode(array('ok' => false, 'msg' => 'Mensagem inválida.'));
+        exit;
+    }
     $corpo = fetch_corpo($mbox, $uid);
     $h = imap_rfc822_parse_headers(imap_fetchheader($mbox, $uid, FT_UID));
     $de = dec_header(isset($h->fromaddress) ? $h->fromaddress : '');
@@ -189,24 +231,41 @@ if ($acao === 'ler') {
     $data = isset($h->date) ? date('d/m/Y H:i', strtotime($h->date)) : '';
     @imap_setflag_full($mbox, $uid, "\\Seen", ST_UID);
     imap_close($mbox);
-    echo json_encode(array('ok'=>true, 'de'=>$de, 'para'=>$para, 'assunto'=>$assunto, 'data'=>$data,
-                           'html'=>$corpo['html'], 'texto'=>$corpo['texto'], 'anexos'=>$corpo['anexos']));
+    echo json_encode(array(
+        'ok' => true,
+        'de' => $de,
+        'para' => $para,
+        'assunto' => $assunto,
+        'data' => $data,
+        'html' => $corpo['html'],
+        'texto' => $corpo['texto'],
+        'anexos' => $corpo['anexos']
+    ));
     exit;
 }
 
 if ($acao === 'marcar_lida') {
     $uids = isset($in['uids']) ? $in['uids'] : array();
-    if (!is_array($uids) || !count($uids)) { imap_close($mbox); echo json_encode(array('ok'=>false, 'msg'=>'Nenhuma mensagem selecionada.')); exit; }
+    if (!is_array($uids) || !count($uids)) {
+        imap_close($mbox);
+        echo json_encode(array('ok' => false, 'msg' => 'Nenhuma mensagem selecionada.'));
+        exit;
+    }
     $seq = implode(',', array_map('intval', $uids));
     if (!empty($in['nao_lida'])) @imap_clearflag_full($mbox, $seq, "\\Seen", ST_UID);
     else                         @imap_setflag_full($mbox, $seq, "\\Seen", ST_UID);
     imap_close($mbox);
-    echo json_encode(array('ok'=>true)); exit;
+    echo json_encode(array('ok' => true));
+    exit;
 }
 
 if ($acao === 'excluir') {
     $uids = isset($in['uids']) ? $in['uids'] : array();
-    if (!is_array($uids) || !count($uids)) { imap_close($mbox); echo json_encode(array('ok'=>false, 'msg'=>'Nenhuma mensagem selecionada.')); exit; }
+    if (!is_array($uids) || !count($uids)) {
+        imap_close($mbox);
+        echo json_encode(array('ok' => false, 'msg' => 'Nenhuma mensagem selecionada.'));
+        exit;
+    }
     $seq = implode(',', array_map('intval', $uids));
     // procura a pasta de Lixeira
     $lixeira = null;
@@ -214,19 +273,25 @@ if ($acao === 'excluir') {
     if ($lista) foreach ($lista as $l) {
         $nome = str_replace($ref, '', $l);
         $low = strtolower($nome);
-        if (strpos($low,'trash')!==false || strpos($low,'lixeira')!==false || strpos($low,'deleted')!==false) { $lixeira = $nome; break; }
+        if (strpos($low, 'trash') !== false || strpos($low, 'lixeira') !== false || strpos($low, 'deleted') !== false) {
+            $lixeira = $nome;
+            break;
+        }
     }
     // a pasta atual já é a lixeira? então é exclusão definitiva
     $lowAtual = strtolower($pasta);
-    $atualEhLixeira = (strpos($lowAtual,'trash')!==false || strpos($lowAtual,'lixeira')!==false || strpos($lowAtual,'deleted')!==false);
+    $atualEhLixeira = (strpos($lowAtual, 'trash') !== false || strpos($lowAtual, 'lixeira') !== false || strpos($lowAtual, 'deleted') !== false);
     $movido = false;
     if ($lixeira && !$atualEhLixeira) {
         $movido = @imap_mail_move($mbox, $seq, $lixeira, CP_UID);
     }
-    if (!$movido) { @imap_delete($mbox, $seq, FT_UID); }   // fallback / exclusão definitiva
+    if (!$movido) {
+        @imap_delete($mbox, $seq, FT_UID);
+    }   // fallback / exclusão definitiva
     @imap_expunge($mbox);
     imap_close($mbox);
-    echo json_encode(array('ok'=>true, 'movido'=>(bool)$movido)); exit;
+    echo json_encode(array('ok' => true, 'movido' => (bool)$movido));
+    exit;
 }
 
 // acao = listar (padrão) — busca por PERÍODO (últimos N dias OU intervalo de datas) e opcionalmente por REMETENTE
@@ -235,21 +300,28 @@ $desde_in = isset($in['desde']) ? trim($in['desde']) : '';   // 'YYYY-MM-DD'
 $ate_in   = isset($in['ate'])   ? trim($in['ate'])   : '';   // 'YYYY-MM-DD'
 $remet    = isset($in['remetente']) ? trim($in['remetente']) : '';
 $max = isset($in['max']) ? intval($in['max']) : 500;
-if ($max < 1) $max = 500; if ($max > 1500) $max = 1500;
+if ($max < 1) $max = 500;
+if ($max > 1500) $max = 1500;
 
 $criterios = array();
 $modo = 'dias';
 if ($desde_in !== '' || $ate_in !== '') {
     $modo = 'periodo';
-    if ($desde_in !== '') { $ts1 = strtotime($desde_in); if ($ts1) $criterios[] = 'SINCE "'.date('d-M-Y', $ts1).'"'; }
-    if ($ate_in !== '')   { $ts2 = strtotime($ate_in.' +1 day'); if ($ts2) $criterios[] = 'BEFORE "'.date('d-M-Y', $ts2).'"'; }
+    if ($desde_in !== '') {
+        $ts1 = strtotime($desde_in);
+        if ($ts1) $criterios[] = 'SINCE "' . date('d-M-Y', $ts1) . '"';
+    }
+    if ($ate_in !== '') {
+        $ts2 = strtotime($ate_in . ' +1 day');
+        if ($ts2) $criterios[] = 'BEFORE "' . date('d-M-Y', $ts2) . '"';
+    }
 } else {
     if ($dias < 1) $dias = 60;
-    $criterios[] = 'SINCE "'.date('d-M-Y', strtotime('-'.$dias.' days')).'"';
+    $criterios[] = 'SINCE "' . date('d-M-Y', strtotime('-' . $dias . ' days')) . '"';
 }
 if ($remet !== '') {
     $remet_limpo = str_replace(array('"', "\r", "\n"), '', $remet);
-    $criterios[] = 'FROM "'.$remet_limpo.'"';
+    $criterios[] = 'FROM "' . $remet_limpo . '"';
 }
 $criterioStr = trim(implode(' ', $criterios));
 if ($criterioStr === '') $criterioStr = 'ALL';
@@ -270,11 +342,17 @@ if ($modo === 'dias' && $total > 0) {
 }
 // limite inferior do período (com 1 dia de margem p/ fuso) — descarta recentes fora do período
 $limiteInf = 0;
-if ($modo === 'dias') { $limiteInf = strtotime(date('Y-m-d', strtotime('-'.($dias+1).' days')).' 00:00:00'); }
+if ($modo === 'dias') {
+    $limiteInf = strtotime(date('Y-m-d', strtotime('-' . ($dias + 1) . ' days')) . ' 00:00:00');
+}
 
 $encontrados = count($uids);
 $truncado = false;
-if ($encontrados > $max) { rsort($uids); $uids = array_slice($uids, 0, $max); $truncado = true; }
+if ($encontrados > $max) {
+    rsort($uids);
+    $uids = array_slice($uids, 0, $max);
+    $truncado = true;
+}
 $msgs = array();
 $maisRecente = '';
 if (!empty($uids)) {
@@ -293,9 +371,14 @@ if (!empty($uids)) {
             '_ts'     => $ts
         );
     }
-    usort($msgs, function($a, $b){ return $b['_ts'] <=> $a['_ts']; });  // mais recente primeiro
+    usort($msgs, function ($a, $b) {
+        return $b['_ts'] <=> $a['_ts'];
+    });  // mais recente primeiro
     if (count($msgs) && $msgs[0]['_ts']) $maisRecente = date('d/m/Y H:i', $msgs[0]['_ts']);
-    foreach ($msgs as &$mm) { unset($mm['_ts']); } unset($mm);
+    foreach ($msgs as &$mm) {
+        unset($mm['_ts']);
+    }
+    unset($mm);
 }
 imap_close($mbox);
-echo json_encode(array('ok'=>true, 'total'=>$total, 'encontrados'=>count($msgs), 'dias'=>$dias, 'modo'=>$modo, 'criterio'=>$criterioStr, 'truncado'=>$truncado, 'server_time'=>date('d/m/Y H:i:s'), 'mais_recente'=>$maisRecente, 'mensagens'=>$msgs));
+echo json_encode(array('ok' => true, 'total' => $total, 'encontrados' => count($msgs), 'dias' => $dias, 'modo' => $modo, 'criterio' => $criterioStr, 'truncado' => $truncado, 'server_time' => date('d/m/Y H:i:s'), 'mais_recente' => $maisRecente, 'mensagens' => $msgs));

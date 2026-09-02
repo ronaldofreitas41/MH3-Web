@@ -34,8 +34,8 @@
    ============================================================ */
 
 return [
-    'host'    => 'mh3sistema.mysql.dbaas.com.br',
-    'nome'    => 'mh3sistema',
-    'usuario' => 'mh3sistema',
-    'senha'   => 'Fraga62970123#',
+  'host'    => 'mh3sistema.mysql.dbaas.com.br',
+  'nome'    => 'mh3sistema',
+  'usuario' => 'mh3sistema',
+  'senha'   => 'Fraga62970123#',
 ];
