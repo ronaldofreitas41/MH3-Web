@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>MH3 Rental — Acesso ao Sistema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --dk:#0f1115; --cd:#181b21; --cd2:#1f242c; --br:#2a2f37; --br2:#333a44;
+    --mt:#8b95a3; --tx:#e6e9ee; --red:#C8102E; --rg:rgba(200,16,46,.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{background:var(--dk);color:var(--tx);font-family:'Barlow',sans-serif;
+       display:flex;align-items:center;justify-content:center;flex-direction:column;}
+  button:hover{filter:brightness(1.08);}
+</style>
+</head>
+<body>
+<div style="background:var(--cd);border:1px solid var(--br2);border-radius:14px;width:100%;max-width:380px;padding:36px 32px;margin:16px;">
+  <div style="text-align:center;margin-bottom:28px;">
+    <div style="font-family:Arial,sans-serif;font-size:76px;font-weight:900;font-style:italic;color:#C8102E;letter-spacing:1px;line-height:1;transform:skewX(-10deg);display:inline-block;">MH3</div>
+    <div style="font-size:10px;color:var(--mt);letter-spacing:2px;text-transform:uppercase;margin-top:4px;">Sistema de Gestão · João Monlevade/MG</div>
+  </div>
+  <div id="login-erro" style="display:none;background:var(--rg);border:1px solid rgba(200,16,46,.3);color:#ff6b81;border-radius:6px;padding:9px 12px;font-size:12px;margin-bottom:14px;text-align:center;"></div>
+  <div style="margin-bottom:14px;">
+    <label style="display:block;font-size:9px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;font-family:'Barlow Condensed',sans-serif;">Usuário</label>
+    <input id="lg-user" type="text" placeholder="Seu login" autocomplete="username" style="width:100%;background:var(--cd2);border:1px solid var(--br);border-radius:6px;color:var(--tx);padding:10px 13px;font-size:14px;font-family:'Barlow',sans-serif;outline:none;" onkeydown="if(event.key==='Enter')document.getElementById('lg-pass').focus()">
+  </div>
+  <div style="margin-bottom:22px;">
+    <label style="display:block;font-size:9px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:5px;font-family:'Barlow Condensed',sans-serif;">Senha</label>
+    <div style="position:relative;">
+      <input id="lg-pass" type="password" placeholder="Sua senha" autocomplete="current-password" style="width:100%;background:var(--cd2);border:1px solid var(--br);border-radius:6px;color:var(--tx);padding:10px 13px;font-size:14px;font-family:'Barlow',sans-serif;outline:none;" onkeydown="if(event.key==='Enter')fazerLogin()">
+      <button onclick="toggleSenhaLogin()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--mt);cursor:pointer;font-size:16px;" id="lg-eye">&#128065;</button>
+    </div>
+  </div>
+  <button onclick="fazerLogin()" id="lg-btn" style="width:100%;background:var(--red);color:white;border:none;border-radius:7px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Barlow',sans-serif;letter-spacing:.5px;">Entrar no Sistema</button>
+  <div style="text-align:center;margin-top:18px;font-size:10px;color:var(--mt);">MH3 Rental · João Monlevade/MG · CNPJ: 26.881.195/0001-10</div>
+</div>
+
+<script>
+function toggleSenhaLogin(){
+  const inp=document.getElementById('lg-pass'), eye=document.getElementById('lg-eye');
+  if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
+  else{inp.type='password';eye.textContent='👁';}
+}
+async function fazerLogin(){
+  const btn=document.getElementById('lg-btn'), erro=document.getElementById('login-erro');
+  const user=(document.getElementById('lg-user').value||'').trim();
+  const pass=document.getElementById('lg-pass').value||'';
+  erro.style.display='none';
+  if(!user||!pass){erro.textContent='Preencha usuário e senha';erro.style.display='block';return;}
+  btn.textContent='Entrando...';btn.disabled=true;
+  try{
+    const res=await fetch('api.php?action=login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      credentials:'same-origin',
+      body:JSON.stringify({login:user.toLowerCase(),senha:pass})
+    });
+    const r=await res.json();
+    if(r.ok&&r.token){
+      // guarda o token para as chamadas do app (além do cookie HttpOnly que o servidor setou)
+      localStorage.setItem('mh3_token',r.token);
+      localStorage.setItem('mh3_user',JSON.stringify({nome:r.nome,perfil:r.perfil}));
+      window.location.replace('/');   // recarrega a raiz -> porteiro entrega o sistema
+      return;
+    }
+    erro.textContent=r.msg||'Usuário ou senha incorretos';erro.style.display='block';
+  }catch(e){
+    erro.textContent='Sem conexão com o servidor. Tente novamente.';erro.style.display='block';
+  }
+  btn.textContent='Entrar no Sistema';btn.disabled=false;
+}
+</script>
+</body>
+</html>
