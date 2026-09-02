@@ -1,8 +1,0 @@
-<div class="topbar">
-<div class="tb-l"><button class="hmbg" onclick="toggleSB()" title="Abrir/recolher menu">☰</button><div class="tb-title" id="ptitle">Dashboard</div>
-<div class="no-print" id="tb-busca-wrap" style="position:relative;margin-left:14px">
-<input id="busca-global" onblur="setTimeout(()=&gt;{const r=document.getElementById('busca-global-res');if(r)r.style.display='none'},200)" oninput="buscaGlobal(this.value)" placeholder="🔍 Buscar placa, cliente, OS..." style="padding:7px 12px;border:1px solid var(--br);border-radius:20px;background:var(--cd2);color:var(--tx);font-size:12px;width:220px"/>
-<div id="busca-global-res" style="display:none;position:absolute;top:38px;left:0;width:320px;max-height:360px;overflow-y:auto;background:var(--cd);border:1px solid var(--br);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.2);z-index:9999"></div>
-</div></div>
-<div class="tb-r"><span id="tdate" style="font-size:9px;color:var(--mt);"></span><button class="btn bg btn-sm no-print" onclick="recarregarDados()" title="Atualizar / puxar dados do servidor">🔄</button><button class="btn bg btn-sm no-print" onclick="imprimirComOpcoes(document.getElementById('ptitle')?document.getElementById('ptitle').textContent:'')" title="Imprimir / Salvar PDF / Compartilhar">🖨</button><span class="sec-badge no-print">Seguro</span><button class="btn bg btn-sm no-print" onclick="openM('m-senha')" title="Trocar minha senha">🔑 Senha</button><button class="btn bg btn-sm no-print" id="btn-edicao-livre" onclick="toggleEdicaoLivre()" style="display:none" title="Liberar campos travados para edição (somente admin)">🔒 Edição livre</button><button class="btn bg btn-sm no-print" onclick="fazerLogout()" title="Sair do sistema">⏏ Sair</button></div>
-</div>

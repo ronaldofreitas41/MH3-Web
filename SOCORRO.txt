@@ -1,0 +1,132 @@
+================================================================
+  SOCORRO MH3 — COMO USAR
+  24/08/2026
+================================================================
+
+O QUE VOCE RECEBEU
+
+  1) MH3_SOCORRO.html   — a ferramenta
+  2) SUBIR_api.php      — api v56 (o de hoje + o que faltava)
+
+----------------------------------------------------------------
+PASSO 1 — SUBIR O API NOVO
+
+  Pelo FileZilla, em modo BINARIO, suba SUBIR_api.php
+  renomeando para  api.php  na mesma pasta de sempre.
+
+  Confira que subiu:
+    dmsserv.com.br/api.php?action=ping
+  Tem que dizer  "versao":"24/08/2026 v56"
+
+  O QUE MUDOU NO API
+  Nada do que ja existia foi tocado. Confira voce mesmo: o bloco
+  de login e IDENTICO, letra por letra, ao de 16/08. As 6 coisas
+  novas foram acrescentadas no fim do arquivo:
+
+    destravar_login    solta um login trancado pelas tentativas
+    reativar_usuario   devolve quem foi desativado
+    sessoes_faxina     derruba SO as sessoes ja vencidas
+    conferir_arquivos  confere parte1..parte6 no disco do servidor
+    usuario_obter      le um cadastro inteiro, permissoes incluidas
+    travados           diz quem esta trancado NESTE momento
+
+----------------------------------------------------------------
+PASSO 2 — GUARDAR A FERRAMENTA
+
+  Guarde MH3_SOCORRO.html no computador, num lugar facil de
+  achar. Uma copia no pendrive tambem vale a pena: ela funciona
+  quando o sistema nao abre.
+
+  Abra com dois cliques. Confira o endereco e a chave, e clique
+  em EXAMINAR TUDO.
+
+  SUBA UMA COPIA NO SERVIDOR TAMBEM
+  Pelo FileZilla, na mesma pasta, com o nome socorro.html.
+  Abrindo por dmsserv.com.br/socorro.html ela ganha uma coisa a
+  mais: consegue examinar a memoria do navegador, que e onde
+  esteve o problema de hoje. E HTML puro — nao executa nada no
+  servidor, nao e porta de entrada para ninguem.
+
+----------------------------------------------------------------
+O QUE ELA FAZ
+
+  EXAMINA QUATRO COISAS
+    . Entrada no sistema  — quem pode entrar, quem esta trancado,
+                            quem foi desativado, login repetido,
+                            formato das senhas, codigo de acesso
+    . Este navegador      — memoria cheia, listas que so existem
+                            ali, cracha guardado
+    . Servidor e arquivos — se o servidor responde, se parte1 a
+                            parte6 estao la e inteiros, se algum
+                            bloco de script ficou sem fechar
+    . Banco e dados       — peso, velocidade de abertura, copia
+                            leve, fotos dentro do banco, backups
+                            e registros acumulados
+
+  CONSERTA, COM CONFIRMACAO NA TELA
+    . destravar um login trancado
+    . reativar usuario desativado
+    . derrubar sessoes vencidas
+    . limpar so o lixo da memoria do navegador
+    . migrar o que falta para a copia leve
+    . simular a retirada das fotos do banco
+    . apagar backup e registro velhos
+
+  CRIA E ALTERA USUARIOS
+    Sem os dois defeitos da tela do sistema:
+      "exclui e ele volta"      — aqui nao volta
+      "altero e ele cria outro" — aqui altera o mesmo cadastro
+
+    E preserva as permissoes. Isso importa mais do que parece:
+    salvar um usuario sem reenviar as permissoes ZERA as 123 dele
+    de uma vez, sem avisar. Eu provei isso hoje no banco de teste:
+      antes  : 123 permissoes
+      depois :   0 permissoes
+    A ferramenta le o cadastro inteiro antes de salvar e reenvia
+    as permissoes junto. Por isso, para mexer em usuario, prefira
+    ela a tela do sistema ate a tela ser corrigida.
+
+----------------------------------------------------------------
+O TESTE MAIS IMPORTANTE — "A PORTA DE ENTRADA"
+
+  E o que teria resolvido a manha de 24/08 em trinta segundos.
+
+  A tela do sistema mostra "usuario e senha incorretos" para
+  QUALQUER recusa. O servidor, na verdade, responde coisas bem
+  diferentes:
+
+    "Muitas tentativas. Aguarde 15 minutos."  -> porta trancada
+    "Login ou senha incorretos."              -> senha mesmo
+    "Codigo de acesso invalido."              -> o segundo codigo
+    entrou                                    -> a senha esta certa,
+                                                 o problema e o navegador
+
+  A ferramenta mostra a resposta crua e diz o que cada uma
+  significa. Use UMA vez — cada tentativa errada conta no mesmo
+  contador da tela de login.
+
+----------------------------------------------------------------
+O QUE ELA NAO FAZ, DE PROPOSITO
+
+  . Nao mostra nem define senha de ninguem. Redefinir senha
+    continua sendo coisa de quem tem o painel do banco.
+  . Nao apaga dado de trabalho. So apaga contador de erro de
+    login, sessao vencida, backup velho e registro velho — e
+    sempre dizendo quanto, antes.
+  . Nao encosta em parte1..parte6.
+
+----------------------------------------------------------------
+UMA COISA PARA VOCE DECIDIR
+
+  A chave MH3-DIAG-2026 esta escrita dentro do api.php. Quem
+  souber ela consegue rodar os diagnosticos e os consertos. Hoje
+  ela ja dava esse poder — o codigo_acesso, por exemplo, tira o
+  segundo fator de qualquer usuario.
+
+  Vale trocar por uma chave sua. Sao dois lugares:
+    . dentro do api.php, procure  MH3-DIAG-2026  (aparece varias
+      vezes; troque todas)
+    . no campo "chave de diagnostico" da ferramenta
+
+  Se quiser, eu faco isso e te devolvo os dois arquivos prontos.
+================================================================
